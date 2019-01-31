@@ -1,0 +1,31 @@
+#!/usr/bin/env sh
+
+# Exit, if return non-zero or use an undefined variable.
+set -eu
+
+cd "$(dirname "$0")/.."
+
+# Variables
+VERSION=${1:-2.12.3}
+
+os=$(./bin/os)
+distro=$(./bin/distro)
+
+if [ $os = windows ]; then
+	DOWNLOAD_URL=https://storage.googleapis.com/kubernetes-helm/helm-v$VERSION-windows-amd64.zip
+elif [ $os = darwin ]; then
+	DOWNLOAD_URL=https://storage.googleapis.com/kubernetes-helm/helm-v$VERSION-darwin-amd64.tar.gz
+else
+	DOWNLOAD_URL=https://storage.googleapis.com/kubernetes-helm/helm-v$VERSION-linux-amd64.tar.gz
+fi
+
+# Clean
+clean() {
+	rm -rf temp
+}
+
+# Start
+clean
+filename=$(./bin/download $DOWNLOAD_URL)
+echo "filename: $filename"
+./bin/extract "$filename" "versions/$VERSION"
